@@ -8,23 +8,22 @@ import {
 	useLoaderData,
 } from "@remix-run/react";
 
-import { db } from "~/utils/server/db.server";
-
-import { getUser } from "~/utils/server/session.server";
+import { db } from "lib/db";
+import { UserSessionService as USS } from "User";
 
 
 type LoaderData = {
-	user: Awaited<ReturnType<typeof getUser>>;
-	postListItems: Array<{ id: number; name: string; }>;
+	user: Awaited<ReturnType<typeof USS.get>>;
+	postListItems: Array<{ id: number; title: string; }>;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
 	const postListItems = await db.post.findMany({
 		take: 5,
 		orderBy: { createdAt: "desc" },
-		select: { id: true, name: true },
+		select: { id: true, title: true },
 	});
-	const user = await getUser(request);
+	const user = await USS.get(request);
 
 	const data: LoaderData = {
 		postListItems,
@@ -62,7 +61,7 @@ export default function PostsRoute() {
 						<ul>
 							{data.postListItems.map((post) => (
 								<li key={post.id}>
-									<Link to={post.id.toString()}>{post.name}</Link>
+									<Link to={post.id.toString()}>{post.title}</Link>
 								</li>
 							))}
 						</ul>

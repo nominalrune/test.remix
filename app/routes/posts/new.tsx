@@ -2,9 +2,9 @@ import type { ActionFunction } from "@remix-run/node";
 
 import { json, redirect } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
-import { db } from "~/utils/server/db.server";
+import { db } from "lib/db";
 
-import { requireUserId } from "~/utils/server/session.server";
+import { UserSessionService as USS} from "User";
 
 
 function validateContent(content: string) {
@@ -12,19 +12,19 @@ function validateContent(content: string) {
 		return `That is too short`;
 	}
 }
-function validateName(name: string) {
-	if (name.length < 1) {
-		return `That name is too short`;
+function validateTitle(title: string) {
+	if (title.length < 1) {
+		return `That title is too short`;
 	}
 }
 type ActionData = {
 	formError?: string;
 	fieldErrors?: {
-		name: string | undefined;
+		title: string | undefined;
 		content: string | undefined;
 	};
 	fields?: {
-		name: string;
+		title: string;
 		content: string;
 		authorId:number;
 	};
@@ -35,23 +35,24 @@ const badRequest = (data: ActionData) =>
 export const action: ActionFunction = async ({
 	request,
 }) => {
-	const userId = await requireUserId(request);
+	const userId = (await USS.get(request))?.id;
 	const form = await request.formData();
-	const name = form.get("name");
+	const title= form.get("title");
 	const content = form.get("content");
 	if (
-		typeof name !== "string" ||
-		typeof content !== "string"
+		typeof title!== "string" ||
+		typeof content !== "string" ||
+		!userId
 	) {
 		return badRequest({
 			formError: `Form not submitted correctly.`,
 		});
 	}
 	const fieldErrors = {
-		name: validateName(name),
+		title: validateTitle(title),
 		content: validateContent(content)
 	};
-	const fields = { name, content, authorId:userId };
+	const fields = { title, content, authorId:userId };
 	if (Object.values(fieldErrors).some(Boolean)) {
 		return badRequest({ fieldErrors, fields });
 	}
@@ -68,29 +69,29 @@ export default function NewPostsRoute() {
 			<form method="post">
 				<div>
 					<label>
-						Name:{" "}
+						title:{" "}
 						<input
 							type="text"
-							defaultValue={actionData?.fields?.name}
-							name="name"
+							defaultValue={actionData?.fields?.title}
+							title="title"
 							aria-invalid={
-								Boolean(actionData?.fieldErrors?.name) ||
+								Boolean(actionData?.fieldErrors?.title) ||
 								undefined
 							}
 							aria-errormessage={
-								actionData?.fieldErrors?.name
-									? "name-error"
+								actionData?.fieldErrors?.title
+									? "title-error"
 									: undefined
 							}
 						/>
 					</label>
-					{actionData?.fieldErrors?.name ? (
+					{actionData?.fieldErrors?.title? (
 						<p
-							className="form-validation-error"
+							classtitle="form-validation-error"
 							role="alert"
-							id="name-error"
+							id="title-error"
 						>
-							{actionData.fieldErrors.name}
+							{actionData.fieldErrors.title}
 						</p>
 					) : null}
 				</div>
@@ -99,7 +100,7 @@ export default function NewPostsRoute() {
 						Content:{" "}
 						<textarea
 							defaultValue={actionData?.fields?.content}
-							name="content"
+							title="content"
 							aria-invalid={
 								Boolean(actionData?.fieldErrors?.content) ||
 								undefined
@@ -113,7 +114,7 @@ export default function NewPostsRoute() {
 					</label>
 					{actionData?.fieldErrors?.content ? (
 						<p
-							className="form-validation-error"
+							classtitle="form-validation-error"
 							role="alert"
 							id="content-error"
 						>
@@ -124,13 +125,13 @@ export default function NewPostsRoute() {
 				<div>
 					{actionData?.formError ? (
 						<p
-							className="form-validation-error"
+							classtitle="form-validation-error"
 							role="alert"
 						>
 							{actionData.formError}
 						</p>
 					) : null}
-					<button type="submit" className="button">
+					<button type="submit" classtitle="button">
 						Add
 					</button>
 				</div>
@@ -140,7 +141,7 @@ export default function NewPostsRoute() {
 }
 export function ErrorBoundary() {
 	return (
-	  <div className="error-container">
+	  <div classtitle="error-container">
 		Something unexpected went wrong. Sorry about that.
 	  </div>
 	);

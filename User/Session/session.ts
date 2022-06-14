@@ -1,4 +1,4 @@
-import { db } from "../db.server";
+import { Repository } from "User/Repository";
 import {
 	createCookieSessionStorage,
 	redirect,
@@ -17,7 +17,7 @@ export function getUserSession(request: Request) {
 }
 export const storage = createCookieSessionStorage({
 	cookie: {
-		name: "r_session",
+		name: "_session",
 		// `secure: true`but that doesn't work on localhost for Safari
 		// https://web.dev/when-to-use-local-https/
 		secure: process.env.NODE_ENV === "production",
@@ -55,14 +55,10 @@ export async function getUser(request: Request) {
 		return null;
 	}
 
-	//try {
-		const user = await db.user.findUnique({
-			where: { id: userId },
-			select: { id: true, username: true },
-		});
-		return user;
+	const { id, username } = await Repository.get(userId);
+	return { id, username };
 	//} catch {
-		//throw logout(request); // NOTE is this valid? we'd better make `confirmUser` or something like that
+	//throw logout(request); // NOTE is this valid? we'd better make `confirmUser` or something like that
 	//}
 }
 export async function createUserSession(

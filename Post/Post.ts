@@ -1,43 +1,40 @@
-interface IUser {
+import { User } from 'User';
+
+export interface IPost {
 	id?: number;
-	username: string;
-	email: string;
 	createdAt?: Date;
 	updatedAt?: Date;
-	passwordHash?: string;
+	title: string;
+	content: string;
+	authorId: number;
+	author?: User;
 }
 
-class User implements IUser {
+export class Post implements IPost {
 	#id?: number;
-	#username: string;
 	#createdAt?: Date;
 	#updatedAt?: Date;
-	#email: string;
-	#passwordHash?: string;
+	#title: string;
+	#content: string;
+	#authorId: number;
 	constructor(arg: {
-		username: string,
-		email: string,
-		id?: number;
+		id?: number,
 		createdAt?: Date,
 		updatedAt?: Date,
-		passwordHash?: string;
+		title: string,
+		content: string,
+		authorId: number;
 	}) {
-		this.#username = arg.username;
-		this.#email = arg.email;
 		this.#id = arg.id;
 		this.#createdAt = arg.createdAt;
 		this.#updatedAt = arg.updatedAt;
-		this.#passwordHash = arg.passwordHash;
+		this.#title = arg.title;
+		this.#content = arg.content;
+		this.#authorId = arg.authorId;
 	}
 	get id(): number {
 		if(this.#id===undefined) throw new Error("id is undefined");
 		return this.#id;
-	}
-	get username(): string {
-		return this.#username;
-	}
-	get email(): string {
-		return this.#email;
 	}
 	get createdAt(): Date {
 		if(this.#createdAt===undefined) throw new Error("createdAt is undefined");
@@ -47,11 +44,13 @@ class User implements IUser {
 		if(this.#updatedAt===undefined) throw new Error("updatedAt is undefined");
 		return this.#updatedAt;
 	}
-	get passwordHash(): string {
-		if(this.#passwordHash===undefined) throw new Error("passwordHash is undefined");
-		return this.#passwordHash;
+	get title(): string {
+		return this.#title;
+	}
+	get content(): string {
+		return this.#content;
+	}
+	get authorId(): number {
+		return this.#authorId;
 	}
 }
-
-export  type { IUser };
-export { User };

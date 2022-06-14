@@ -3,21 +3,19 @@ import {
 	useResolvedPath
 } from "@remix-run/react";
 import { json } from "@remix-run/node";
-import { db } from "~/utils/server/db.server";
 
-
+import {Post, PostController as PC} from "Post"
+import type {IPost}from "Post";
 import type { LoaderFunction } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import type { Post } from "@prisma/client";
 
 
-type LoaderData = { post: Post; };
+
+type LoaderData = { post: IPost; };
 
 export const loader: LoaderFunction = async ({ params }) => {
 	if (!params.postId) throw new Error("postId not found");
-	const post = await db.post.findUnique({
-		where: { id: parseInt(params.postId) },
-	});
+	const post = await PC.get(parseInt(params.postId) );
 	if (!post) throw new Error("post not found");
 	const data: LoaderData = { post };
 	return json(data);
@@ -28,10 +26,10 @@ export default function PostRoute() {
 
 	return (
 		<div>
-			<p>Here's your hilarious post:</p>
+			<p>Here's your post:</p>
 			<p>
 				<p>{data.post.content}</p>
-				<Link to=".">{data.post.name} Permalink</Link>
+				<Link to=".">{data.post.title} Permalink</Link>
 			</p>
 		</div>
 	);

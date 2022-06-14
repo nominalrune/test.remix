@@ -3,10 +3,9 @@ import type {
 } from "@remix-run/node";
 
 import {
-	login,
-	register,
-	createUserSession
-} from "~/utils/server/session.server";
+	UserSessionService as USS,
+	UserController as UC
+} from "User";
 import { json } from "@remix-run/node";
 import {
 	useActionData,
@@ -14,20 +13,8 @@ import {
 	useSearchParams,
 } from "@remix-run/react";
 
-import { db } from "~/utils/server/db.server";
 
 
-function validateEmail(email: unknown) {
-	if (typeof email !== "string" || email.length < 3) {
-		return `emails must be at least 3 characters long`;
-	}
-}
-
-function validatePassword(password: unknown) {
-	if (typeof password !== "string" || password.length < 6) {
-		return `Passwords must be at least 6 characters long`;
-	}
-}
 
 function validateUrl(url: any) {
 	console.log(url);
@@ -43,11 +30,13 @@ type ActionData = {
 	fieldErrors?: {
 		password: string | undefined;
 		email: string | undefined;
+		username: string | undefined;
 	};
 	fields?: {
 		loginType: string;
 		password: string;
 		email: string;
+		username: string;
 	};
 };
 
@@ -77,45 +66,44 @@ export const action: ActionFunction = async ({
 		});
 	}
 
-	const fields = { loginType, password, email };
+	const fields = { loginType, password, email ,username};
 	const fieldErrors = {
-		password: validatePassword(password),
-		email: validateEmail(email)
+		password,// password: validatePassword(password),
+		email,// email: validateEmail(email)
+		username
 	};
 	if (Object.values(fieldErrors).some(Boolean))
 		return badRequest({ fieldErrors, fields });
 
 	switch (loginType) {
 		case "login": {
-			const user = await login({ password, email });
+			const user = await USS.login({ password, email });
 			console.log({ user });
-			if (!user) {
+			if (!user||!user?.id) {
 				return badRequest({
 					fields,
-					formError: `Email/Password combination is incorrect`,
+					formError: `something is incorrect`,
 				});
 			}
-			return createUserSession(user.id, redirectTo);
+			return USS.create(user.id, redirectTo);
 		}
 		case "register": {
-			const userExists = await db.user.findFirst({
-				where: { email },
-			});
+			const userExists = await UC.get(email);
 			if (userExists) {
 				return badRequest({
 					fields,
 					formError: `User with email ${email} already exists`,
 				});
 			}
-			const user = await register({email,username,password})
+			const user = await UC.create({username,email,password})
 			console.log({ user });
-			if (!user) {
+			if (!user||!user?.id) {
 				return badRequest({
 					fields,
 					formError: `Email/Password combination is incorrect`,
 				});
 			}
-			return createUserSession(user.id, redirectTo);
+			return USS.create(user.id, redirectTo);
 		}
 		default: {
 			return badRequest({
