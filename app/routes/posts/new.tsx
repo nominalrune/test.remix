@@ -39,6 +39,7 @@ export const action: ActionFunction = async ({
 	const form = await request.formData();
 	const title= form.get("title");
 	const content = form.get("content");
+	console.log({userId,title,content})
 	if (
 		typeof title!== "string" ||
 		typeof content !== "string" ||
@@ -73,7 +74,7 @@ export default function NewPostsRoute() {
 						<input
 							type="text"
 							defaultValue={actionData?.fields?.title}
-							title="title"
+							name="title"
 							aria-invalid={
 								Boolean(actionData?.fieldErrors?.title) ||
 								undefined
@@ -87,7 +88,7 @@ export default function NewPostsRoute() {
 					</label>
 					{actionData?.fieldErrors?.title? (
 						<p
-							classtitle="form-validation-error"
+							className="form-validation-error"
 							role="alert"
 							id="title-error"
 						>
@@ -100,7 +101,7 @@ export default function NewPostsRoute() {
 						Content:{" "}
 						<textarea
 							defaultValue={actionData?.fields?.content}
-							title="content"
+							name="content"
 							aria-invalid={
 								Boolean(actionData?.fieldErrors?.content) ||
 								undefined
@@ -114,7 +115,7 @@ export default function NewPostsRoute() {
 					</label>
 					{actionData?.fieldErrors?.content ? (
 						<p
-							classtitle="form-validation-error"
+							className="form-validation-error"
 							role="alert"
 							id="content-error"
 						>
@@ -125,13 +126,13 @@ export default function NewPostsRoute() {
 				<div>
 					{actionData?.formError ? (
 						<p
-							classtitle="form-validation-error"
+							className="form-validation-error"
 							role="alert"
 						>
 							{actionData.formError}
 						</p>
 					) : null}
-					<button type="submit" classtitle="button">
+					<button type="submit" className="button">
 						Add
 					</button>
 				</div>
@@ -141,7 +142,7 @@ export default function NewPostsRoute() {
 }
 export function ErrorBoundary() {
 	return (
-	  <div classtitle="error-container">
+	  <div className="error-container">
 		Something unexpected went wrong. Sorry about that.
 	  </div>
 	);

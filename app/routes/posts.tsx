@@ -9,6 +9,7 @@ import {
 } from "@remix-run/react";
 
 import { db } from "lib/db";
+import {PostRepository as PR} from "Post"
 import { UserSessionService as USS } from "User";
 
 
@@ -18,12 +19,9 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-	const postListItems = await db.post.findMany({
-		take: 5,
-		orderBy: { createdAt: "desc" },
-		select: { id: true, title: true },
-	});
 	const user = await USS.get(request);
+	console.log("@posts.tsx, loader, user:",user);
+	const postListItems = await PR.where({limit:10,parameter:["id","title"],whereQuery:{authorId:user?.id}})||[];
 
 	const data: LoaderData = {
 		postListItems,
@@ -35,6 +33,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function PostsRoute() {
 	const data = useLoaderData<LoaderData>();
 
+	console.log("@posts.tsx, PostRoute, data:",data);
 	return (
 		<div className="jokes-layout">
 			<header className="jokes-header">
@@ -59,11 +58,13 @@ export default function PostsRoute() {
 					<div className="jokes-list">
 						<p>Here are a few more posts to check out:</p>
 						<ul>
-							{data.postListItems.map((post) => (
+							{data.user ?data.postListItems.map((post) => (
 								<li key={post.id}>
 									<Link to={post.id.toString()}>{post.title}</Link>
 								</li>
-							))}
+							)): (
+								<Link to="/login">Login</Link>
+							)}
 						</ul>
 						<Link to="new" className="button">
 							<button>add new</button>

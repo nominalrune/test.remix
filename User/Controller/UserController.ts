@@ -1,9 +1,8 @@
 import type {IUser} from "User";
 import {Repository} from "User/Repository";
 
-
 export class UserController {
-	static repository=Repository
+	static repository=Repository;
 	/**
 	 * It creates a user with the given username, email, and password
 	 * @param {string} username - string - The username of the user
@@ -11,7 +10,7 @@ export class UserController {
 	 * @param {string} password - string - The password that the user will use to login.
 	 * @returns The user object
 	 */
-	 static async create({username, email, password}:{username: string, email: string, password: string}): Promise<IUser> {
+	static async create({username, email, password}:{username: string, email: string, password: string}): Promise<IUser> {
 		const user = await UserController.repository.create({ username, email, password });
 		return user;
 	}
@@ -22,12 +21,12 @@ export class UserController {
 	 * @param {number|string} idOrEmail - The id or emailaddress of the user we want to get.
 	 * @returns {Promise<IUser>} The user object
 	 */
-	 static async get(idOrEmail: number|string): Promise<IUser> {
+	static async get(idOrEmail: number|string): Promise<IUser|null> {
 		if(typeof idOrEmail === "number") {
 		return await UserController.repository.get(idOrEmail);
 		} else if(typeof idOrEmail === "string") {
 		return await UserController.repository.getByEmail(idOrEmail);
-		}else{
+		} else {
 		throw new Error("Invalid user id/email");
 		}
 	}

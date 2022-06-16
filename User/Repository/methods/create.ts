@@ -1,7 +1,7 @@
 import {db as _db} from "lib/db"
 import {crypt} from "lib/crypt";
 
-import {User} from "User";
+import type {IUser} from "User";
 
 type createParam = {
 	username: string,
@@ -18,11 +18,11 @@ export async function create({
 	username,
 	password,
 	email
-}: createParam,{db}={db:_db}): Promise<User> {
+}: createParam,{db}={db:_db}): Promise<IUser> {
 	const passwordHash = crypt(password);
 	const user = await db.user.create({
 		data: { email, username, passwordHash },
 	});
 	if(user === null) throw new Error("user not created");
-	return new User(user);
+	return user;
 }

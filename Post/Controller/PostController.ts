@@ -23,7 +23,9 @@ export class PostController {
 	 * @returns A Post object
 	 */
 	 static async get(id: number): Promise<IPost> {
-		return new Post(await PostController.repository.get(id));
+		 const post=await PostController.repository.get(id);
+		 if(!post){throw new Error("post not found")};
+		return post;
 	}
 	 static async getAllTitle(authorId:number,limit:number=10): Promise<IPost[]> {
 		const posts=await PostController.repository.where({limit,parameter:["id","title"],whereQuery:{authorId}});
@@ -40,6 +42,6 @@ export class PostController {
 	 */
 	 static async update(id: number, authorId:number, altValue: Partial<Omit<IPost, "id">>): Promise<IPost> {
 		const post = await PostController.repository.update(id,authorId, altValue);
-		return new Post(post);
+		return post;
 	}
 }

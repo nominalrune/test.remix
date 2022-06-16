@@ -61,6 +61,7 @@ export const action: ActionFunction = async ({
 		typeof username !== "string" ||
 		typeof redirectTo !== "string"
 	) {
+		console.log("Form not submitted correctly")
 		return badRequest({
 			formError: `Form not submitted correctly.`,
 		});
@@ -68,21 +69,22 @@ export const action: ActionFunction = async ({
 
 	const fields = { loginType, password, email ,username};
 	const fieldErrors = {
-		password,// password: validatePassword(password),
-		email,// email: validateEmail(email)
-		username
+		password:password&&'',// password: validatePassword(password),
+		email:email&&'',// email: validateEmail(email)
+		username:username&&''
 	};
-	if (Object.values(fieldErrors).some(Boolean))
-		return badRequest({ fieldErrors, fields });
+	if (Object.values(fieldErrors).some(Boolean)){
+		console.log("field error")
+		return badRequest({ fieldErrors, fields });}
 
 	switch (loginType) {
 		case "login": {
-			const user = await USS.login({ password, email });
+			const user = await USS.login({ password, email, redirectTo });
 			console.log({ user });
 			if (!user||!user?.id) {
 				return badRequest({
 					fields,
-					formError: `something is incorrect`,
+					formError: `something is incorrect in login try @login.tsx`,
 				});
 			}
 			return USS.create(user.id, redirectTo);

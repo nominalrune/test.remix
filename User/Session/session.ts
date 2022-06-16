@@ -51,11 +51,13 @@ export async function requireUserId(
 }
 export async function getUser(request: Request) {
 	const userId = await getUserId(request);
-	if (typeof userId !== "string") {
+	if (typeof userId !== "number") {
 		return null;
 	}
 
-	const { id, username } = await Repository.get(userId);
+	const _user = await Repository.get(userId);
+	if(!_user) {return null};
+	const { id, username } = _user;
 	return { id, username };
 	//} catch {
 	//throw logout(request); // NOTE is this valid? we'd better make `confirmUser` or something like that

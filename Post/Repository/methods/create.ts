@@ -23,6 +23,6 @@ authorId
 			content,
 			authorId },
 	});
-	if(post === null) throw new Error("post not created");
+	if(post === null) {console.warn("post not created")};
 	return post;
 }

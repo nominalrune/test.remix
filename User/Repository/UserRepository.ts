@@ -1,9 +1,9 @@
 import { db as _db } from "lib/db";
 
-import {create} from "./methods/create";
-import {update} from "./methods/update";
-import {drop} from "./methods/drop";
-import {get,getByEmail} from "./methods/get";
+import { create } from "./methods/create";
+import { update } from "./methods/update";
+import { drop } from "./methods/drop";
+import { get, getByEmail } from "./methods/get";
 
 export class UserRepository{
 	static get=get;
@@ -17,4 +17,4 @@ export class UserRepository{
 	static create=create;
 	static update=update;
 	static delete=drop;
-}
+};

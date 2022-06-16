@@ -17,13 +17,14 @@ export const loader: LoaderFunction = async ({ params }) => {
 	if (!params.postId) throw new Error("postId not found");
 	const post = await PC.get(parseInt(params.postId) );
 	if (!post) throw new Error("post not found");
+	console.log({params,post},post.id)
 	const data: LoaderData = { post };
 	return json(data);
 };
 
 export default function PostRoute() {
 	const data = useLoaderData<LoaderData>();
-
+	console.log({data},data.post.id);
 	return (
 		<div>
 			<p>Here's your post:</p>
