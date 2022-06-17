@@ -6,6 +6,9 @@ import { db } from "lib/db";
 
 import { UserSessionService as USS} from "User";
 
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import SendIcon from "@mui/icons-material/Send";
 
 function validateContent(content: string) {
 	if (content.length < 5) {
@@ -70,11 +73,11 @@ export default function NewPostsRoute() {
 			<form method="post">
 				<div>
 					<label>
-						title:{" "}
-						<input
-							type="text"
+						<TextField
+							label="Title"
 							defaultValue={actionData?.fields?.title}
 							name="title"
+							helperText={actionData?.fieldErrors?.title}
 							aria-invalid={
 								Boolean(actionData?.fieldErrors?.title) ||
 								undefined
@@ -86,21 +89,14 @@ export default function NewPostsRoute() {
 							}
 						/>
 					</label>
-					{actionData?.fieldErrors?.title? (
-						<p
-							className="form-validation-error"
-							role="alert"
-							id="title-error"
-						>
-							{actionData.fieldErrors.title}
-						</p>
-					) : null}
 				</div>
 				<div>
 					<label>
-						Content:{" "}
-						<textarea
+						<TextField
+							multiline
+							label="content"
 							defaultValue={actionData?.fields?.content}
+							helperText={actionData?.fieldErrors?.content}
 							name="content"
 							aria-invalid={
 								Boolean(actionData?.fieldErrors?.content) ||
@@ -113,15 +109,7 @@ export default function NewPostsRoute() {
 							}
 						/>
 					</label>
-					{actionData?.fieldErrors?.content ? (
-						<p
-							className="form-validation-error"
-							role="alert"
-							id="content-error"
-						>
-							{actionData.fieldErrors.content}
-						</p>
-					) : null}
+					
 				</div>
 				<div>
 					{actionData?.formError ? (
@@ -132,9 +120,9 @@ export default function NewPostsRoute() {
 							{actionData.formError}
 						</p>
 					) : null}
-					<button type="submit" className="button">
+					<Button variant="contained" type="submit" endIcon={<SendIcon/>}>
 						Add
-					</button>
+					</Button>
 				</div>
 			</form>
 		</div>

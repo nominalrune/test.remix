@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@emotion/react': ^11.9.3
   '@emotion/styled': ^11.9.3
+  '@mui/icons-material': ^5.8.4
   '@mui/material': ^5.8.4
   '@prisma/client': ^3.15.1
   '@remix-run/dev': ^1.5.1
@@ -27,6 +28,7 @@ specifiers:
 dependencies:
   '@emotion/react': 11.9.3_sdsvleu76di7vm2mixpodknkgi
   '@emotion/styled': 11.9.3_py7o3ufdonmt4xxno6zff4hcye
+  '@mui/icons-material': 5.8.4_iwd4k7unyg57w5dv6m722dw3xq
   '@mui/material': 5.8.4_sgmnomwqge26wktcncgaqyjg4i
   '@prisma/client': 3.15.1_prisma@3.15.1
   '@remix-run/node': 1.5.1_sfoxds7t5ydpegc3knd667wn6m
@@ -1712,6 +1714,23 @@ packages:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
+    dev: false
+
+  /@mui/icons-material/5.8.4_iwd4k7unyg57w5dv6m722dw3xq:
+    resolution: {integrity: sha512-9Z/vyj2szvEhGWDvb+gG875bOGm8b8rlHBKOD1+nA3PcgC3fV6W1AU6pfOorPeBfH2X4mb9Boe97vHvaSndQvA==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      '@mui/material': ^5.0.0
+      '@types/react': ^17.0.0 || ^18.0.0
+      react: ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.18.3
+      '@mui/material': 5.8.4_sgmnomwqge26wktcncgaqyjg4i
+      '@types/react': 17.0.45
+      react: 17.0.2
     dev: false
 
   /@mui/material/5.8.4_sgmnomwqge26wktcncgaqyjg4i:

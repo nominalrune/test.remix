@@ -9,7 +9,12 @@ import type {IPost}from "Post";
 import type { LoaderFunction } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 
-
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShareIcon from '@mui/icons-material/Share';
+import IconButton from "@mui/material/IconButton";
+import Card from "@mui/material/Card";
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
 
 type LoaderData = { post: IPost; };
 
@@ -26,13 +31,20 @@ export default function PostRoute() {
 	const data = useLoaderData<LoaderData>();
 	console.log({data},data.post.id);
 	return (
-		<div>
-			<p>Here's your post:</p>
-			<p>
+		<Card elevation={4}>
+			<CardContent>
+				<h1>{data.post.title}</h1>
 				<p>{data.post.content}</p>
-				<Link to=".">{data.post.title} Permalink</Link>
-			</p>
-		</div>
+				</CardContent>
+				<CardActions>
+        <IconButton size="small" >
+			<FavoriteIcon/>
+			</IconButton>
+		<IconButton aria-label="share">
+          <ShareIcon />
+        </IconButton>
+      </CardActions>
+		</Card>
 	);
 }
 export function ErrorBoundary() {
