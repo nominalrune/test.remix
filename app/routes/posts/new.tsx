@@ -2,29 +2,32 @@ import type { ActionFunction } from "@remix-run/node";
 
 import { json, redirect } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
-import { db } from "~/utils/server/db.server";
+import { db } from "lib/db";
 
-import { requireUserId } from "~/utils/server/session.server";
+import { UserSessionService as USS} from "User";
 
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import SendIcon from "@mui/icons-material/Send";
 
 function validateContent(content: string) {
 	if (content.length < 5) {
 		return `That is too short`;
 	}
 }
-function validateName(name: string) {
-	if (name.length < 1) {
-		return `That name is too short`;
+function validateTitle(title: string) {
+	if (title.length < 1) {
+		return `That title is too short`;
 	}
 }
 type ActionData = {
 	formError?: string;
 	fieldErrors?: {
-		name: string | undefined;
+		title: string | undefined;
 		content: string | undefined;
 	};
 	fields?: {
-		name: string;
+		title: string;
 		content: string;
 		authorId:number;
 	};
@@ -35,23 +38,25 @@ const badRequest = (data: ActionData) =>
 export const action: ActionFunction = async ({
 	request,
 }) => {
-	const userId = await requireUserId(request);
+	const userId = (await USS.get(request))?.id;
 	const form = await request.formData();
-	const name = form.get("name");
+	const title= form.get("title");
 	const content = form.get("content");
+	console.log({userId,title,content})
 	if (
-		typeof name !== "string" ||
-		typeof content !== "string"
+		typeof title!== "string" ||
+		typeof content !== "string" ||
+		!userId
 	) {
 		return badRequest({
 			formError: `Form not submitted correctly.`,
 		});
 	}
 	const fieldErrors = {
-		name: validateName(name),
+		title: validateTitle(title),
 		content: validateContent(content)
 	};
-	const fields = { name, content, authorId:userId };
+	const fields = { title, content, authorId:userId };
 	if (Object.values(fieldErrors).some(Boolean)) {
 		return badRequest({ fieldErrors, fields });
 	}
@@ -68,37 +73,30 @@ export default function NewPostsRoute() {
 			<form method="post">
 				<div>
 					<label>
-						Name:{" "}
-						<input
-							type="text"
-							defaultValue={actionData?.fields?.name}
-							name="name"
+						<TextField
+							label="Title"
+							defaultValue={actionData?.fields?.title}
+							name="title"
+							helperText={actionData?.fieldErrors?.title}
 							aria-invalid={
-								Boolean(actionData?.fieldErrors?.name) ||
+								Boolean(actionData?.fieldErrors?.title) ||
 								undefined
 							}
 							aria-errormessage={
-								actionData?.fieldErrors?.name
-									? "name-error"
+								actionData?.fieldErrors?.title
+									? "title-error"
 									: undefined
 							}
 						/>
 					</label>
-					{actionData?.fieldErrors?.name ? (
-						<p
-							className="form-validation-error"
-							role="alert"
-							id="name-error"
-						>
-							{actionData.fieldErrors.name}
-						</p>
-					) : null}
 				</div>
 				<div>
 					<label>
-						Content:{" "}
-						<textarea
+						<TextField
+							multiline
+							label="content"
 							defaultValue={actionData?.fields?.content}
+							helperText={actionData?.fieldErrors?.content}
 							name="content"
 							aria-invalid={
 								Boolean(actionData?.fieldErrors?.content) ||
@@ -111,15 +109,7 @@ export default function NewPostsRoute() {
 							}
 						/>
 					</label>
-					{actionData?.fieldErrors?.content ? (
-						<p
-							className="form-validation-error"
-							role="alert"
-							id="content-error"
-						>
-							{actionData.fieldErrors.content}
-						</p>
-					) : null}
+					
 				</div>
 				<div>
 					{actionData?.formError ? (
@@ -130,9 +120,9 @@ export default function NewPostsRoute() {
 							{actionData.formError}
 						</p>
 					) : null}
-					<button type="submit" className="button">
+					<Button variant="contained" type="submit" endIcon={<SendIcon/>}>
 						Add
-					</button>
+					</Button>
 				</div>
 			</form>
 		</div>

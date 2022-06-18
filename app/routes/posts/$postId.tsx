@@ -3,37 +3,48 @@ import {
 	useResolvedPath
 } from "@remix-run/react";
 import { json } from "@remix-run/node";
-import { db } from "~/utils/server/db.server";
 
-
+import {Post, PostController as PC} from "Post"
+import type {IPost}from "Post";
 import type { LoaderFunction } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import type { Post } from "@prisma/client";
 
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShareIcon from '@mui/icons-material/Share';
+import IconButton from "@mui/material/IconButton";
+import Card from "@mui/material/Card";
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
 
-type LoaderData = { post: Post; };
+type LoaderData = { post: IPost; };
 
 export const loader: LoaderFunction = async ({ params }) => {
 	if (!params.postId) throw new Error("postId not found");
-	const post = await db.post.findUnique({
-		where: { id: parseInt(params.postId) },
-	});
+	const post = await PC.get(parseInt(params.postId) );
 	if (!post) throw new Error("post not found");
+	console.log({params,post},post.id)
 	const data: LoaderData = { post };
 	return json(data);
 };
 
 export default function PostRoute() {
 	const data = useLoaderData<LoaderData>();
-
+	console.log({data},data.post.id);
 	return (
-		<div>
-			<p>Here's your hilarious post:</p>
-			<p>
+		<Card elevation={4}>
+			<CardContent>
+				<h1>{data.post.title}</h1>
 				<p>{data.post.content}</p>
-				<Link to=".">{data.post.name} Permalink</Link>
-			</p>
-		</div>
+				</CardContent>
+				<CardActions>
+        <IconButton size="small" >
+			<FavoriteIcon/>
+			</IconButton>
+		<IconButton aria-label="share">
+          <ShareIcon />
+        </IconButton>
+      </CardActions>
+		</Card>
 	);
 }
 export function ErrorBoundary() {
