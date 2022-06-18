@@ -8,7 +8,48 @@ import {
   ScrollRestoration,
   useCatch,
 } from "@remix-run/react";
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
 
+import type {
+	LoaderFunction,
+} from "@remix-run/node";
+import { json } from "@remix-run/node";
+import {
+	Link,
+	Outlet,
+	useLoaderData,
+} from "@remix-run/react";
+import {useState} from "react";
+
+import {PostRepository as PR} from "Post"
+import { UserSessionService as USS } from "User";
+
+
+
+type LoaderData = {
+	user: Awaited<ReturnType<typeof USS.get>>;
+	postListItems: Array<{ id: number; title: string; }>;
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+	const user = await USS.get(request);
+	console.log("@posts.tsx, loader, user:",user);
+	const postListItems = await PR.where({limit:10,parameter:["id","title"],whereQuery:{authorId:user?.id}})||[];
+
+	const data: LoaderData = {
+		postListItems,
+		user,
+	};
+	return json(data);
+};
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -39,9 +80,84 @@ function Document({
 }
 
 export default function App() {
+  
+  const data = useLoaderData<LoaderData>();
+	const [anchorEl, setAnchorEl] = useState(null);
+
+
+  const handleMenu = (event:any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Document>
-      <Outlet />
+    <Box sx={{ flexGrow: 1 }}>
+      
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            account system
+          </Typography>
+            <div>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem onClick={handleClose}>My account</MenuItem>
+                {data.user ? (
+						<div className="user-info">
+							<span>{`Hi ${data.user.username}`}</span>
+							<form action="/logout" method="post">
+								<button type="submit" className="button">
+									Logout
+								</button>
+							</form>
+						</div>
+					) : (
+            <MenuItem><Link to="/login">Login</Link></MenuItem>
+					)}
+              </Menu>
+            </div>
+        </Toolbar>
+      </AppBar>
+    </Box>
+    
+    <Outlet />
     </Document>
   );
 }

@@ -6,7 +6,9 @@ let prisma: PrismaClient;
 if (process.env.NODE_ENV === "production") {
 	prisma = new PrismaClient();
 } else {
-	prisma = singleton(PrismaClient);
+	if(!prisma){
+	prisma = new PrismaClient();
+}
 }
 
 export { prisma };
